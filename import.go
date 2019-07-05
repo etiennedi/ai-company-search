@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -65,7 +66,7 @@ func importSchema(client *client.WeaviateDecentralisedKnowledgeGraph) {
 
 func importCompanies(client *client.WeaviateDecentralisedKnowledgeGraph,
 	companies []company) {
-	for _, c := range companies {
+	for i, c := range companies {
 		thing := models.Thing{
 			Class: "Company",
 			Schema: map[string]interface{}{
@@ -79,6 +80,11 @@ func importCompanies(client *client.WeaviateDecentralisedKnowledgeGraph,
 		params := things.NewWeaviateThingsCreateParams().WithBody(&thing)
 		_, err := client.Things.WeaviateThingsCreate(params, nil)
 		fatal(err)
+
+		fmt.Print(".")
+		if i != 0 && i%50 == 0 {
+			fmt.Print("\n")
+		}
 	}
 }
 
