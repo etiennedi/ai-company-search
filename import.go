@@ -63,8 +63,8 @@ func importSchema(client *client.WeaviateDecentralisedKnowledgeGraph) {
 		},
 	}
 
-	params := schema.NewWeaviateSchemaThingsCreateParams().WithThingClass(tc)
-	_, err := client.Schema.WeaviateSchemaThingsCreate(params, nil)
+	params := schema.NewSchemaThingsCreateParams().WithThingClass(tc)
+	_, err := client.Schema.SchemaThingsCreate(params, nil)
 	fatal(err)
 }
 
@@ -88,8 +88,8 @@ func importCompanies(client *client.WeaviateDecentralisedKnowledgeGraph,
 			thing.Schema.(map[string]interface{})["locationCoordinates"] = l
 		}
 
-		params := things.NewWeaviateThingsCreateParams().WithBody(&thing)
-		_, err := client.Things.WeaviateThingsCreate(params, nil)
+		params := things.NewThingsCreateParams().WithBody(&thing)
+		_, err := client.Things.ThingsCreate(params, nil)
 		fatal(err)
 
 		fmt.Print(".")
@@ -137,7 +137,7 @@ func fatal(err error) {
 }
 
 func weaviateClient() *client.WeaviateDecentralisedKnowledgeGraph {
-	transport := goswagger.New("localhost:8080", "/weaviate/v1", []string{"http"})
+	transport := goswagger.New("localhost:8080", "/v1", []string{"http"})
 	client := client.New(transport, strfmt.Default)
 	return client
 }
