@@ -23,6 +23,14 @@ Weaviate.
 The list in list.txt is copy/pasted from [the S&P 500 Wikipedia
 page](https://en.wikipedia.org/wiki/List_of_S%26P_500_companies).
 
+## Source of financial data
+
+Downloaded from [here](https://datahub.io/core/s-and-p-500-companies-financials).
+
+> Note that while no credit is formally required a link back or credit to
+> [Rufus Pollock](http://dev.rufuspollock.org/) and the [Open Knowledge
+> Foundation](http://okfn.org/) is much appreciated.
+
 ## Content of this repo
 
 A very simple import script written in Golang, which parses the text file and

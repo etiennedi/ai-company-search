@@ -2,7 +2,9 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"strings"
@@ -17,16 +19,27 @@ import (
 )
 
 type company struct {
-	Name        string
-	Symbol      string
-	Location    string
-	Founded     *time.Time
-	Sector      string
-	SubIndustry string
+	Name             string
+	Symbol           string
+	Location         string
+	Founded          *time.Time
+	Sector           string
+	SubIndustry      string
+	YearHigh         float32
+	YearLow          float32
+	DividendYield    float32
+	EBITDA           float64
+	EarningsPerShare float32
+	MarketCap        float64
+	Price            float32
+	PricePerBook     float32
+	PricePerEarnings float32
+	PricePerSales    float32
 }
 
 func main() {
 	companies := parseCompanies()
+	companies = extendWithFinancialData(companies)
 	client := weaviateClient()
 	importSchema(client)
 	importCompanies(client, companies)
@@ -60,6 +73,46 @@ func importSchema(client *client.WeaviateDecentralisedKnowledgeGraph) {
 				Name:     "locationCoordinates",
 				DataType: []string{"geoCoordinates"},
 			},
+			&models.Property{
+				Name:     "yearHigh",
+				DataType: []string{"number"},
+			},
+			&models.Property{
+				Name:     "yearLow",
+				DataType: []string{"number"},
+			},
+			&models.Property{
+				Name:     "dividendYield",
+				DataType: []string{"number"},
+			},
+			&models.Property{
+				Name:     "ebitda",
+				DataType: []string{"number"},
+			},
+			&models.Property{
+				Name:     "earningsPerShare",
+				DataType: []string{"number"},
+			},
+			&models.Property{
+				Name:     "marketCap",
+				DataType: []string{"number"},
+			},
+			&models.Property{
+				Name:     "price",
+				DataType: []string{"number"},
+			},
+			&models.Property{
+				Name:     "pricePerBook",
+				DataType: []string{"number"},
+			},
+			&models.Property{
+				Name:     "pricePerEarnings",
+				DataType: []string{"number"},
+			},
+			&models.Property{
+				Name:     "pricePerSales",
+				DataType: []string{"number"},
+			},
 		},
 	}
 
@@ -75,11 +128,19 @@ func importCompanies(client *client.WeaviateDecentralisedKnowledgeGraph,
 		thing := models.Thing{
 			Class: "Company",
 			Schema: map[string]interface{}{
-				"symbol":      c.Symbol,
-				"name":        c.Name,
-				"sector":      c.Sector,
-				"subIndustry": c.SubIndustry,
-				"location":    c.Location,
+				"symbol":           c.Symbol,
+				"name":             c.Name,
+				"sector":           c.Sector,
+				"subIndustry":      c.SubIndustry,
+				"location":         c.Location,
+				"dividendYield":    c.DividendYield,
+				"ebitda":           c.EBITDA,
+				"earningsPerShare": c.EarningsPerShare,
+				"marketCap":        c.MarketCap,
+				"price":            c.Price,
+				"pricePerBook":     c.PricePerBook,
+				"pricePerEarnings": c.PricePerEarnings,
+				"pricePerSales":    c.PricePerSales,
 			},
 		}
 
@@ -153,4 +214,60 @@ var locations = map[string]*models.GeoCoordinates{
 
 func lookupCoordinates(location string) *models.GeoCoordinates {
 	return locations[location]
+}
+
+func extendWithFinancialData(companies []company) []company {
+	financialLookup := buildFinancialLookup()
+
+	for i, company := range companies {
+		financial, ok := financialLookup[company.Symbol]
+		if !ok {
+			continue
+		}
+
+		companies[i].YearHigh = financial.YearHigh
+		companies[i].YearLow = financial.YearLow
+		companies[i].DividendYield = financial.DividendYield
+		companies[i].EBITDA = financial.EBITDA
+		companies[i].EarningsPerShare = financial.EarningsPerShare
+		companies[i].MarketCap = financial.MarketCap
+		companies[i].Price = financial.Price
+		companies[i].PricePerBook = financial.PricePerBook
+		companies[i].PricePerEarnings = financial.PricePerEarnings
+		companies[i].PricePerSales = financial.PricePerSales
+		companies[i].Symbol = financial.Symbol
+	}
+
+	return companies
+}
+
+type financeData struct {
+	YearHigh         float32 `json:"52 Week High"`
+	YearLow          float32 `json:"52 Week Low"`
+	DividendYield    float32 `json:"Dividend Yield"`
+	EBITDA           float64 `json:"EBITDA"`
+	EarningsPerShare float32 `json:"Earnings/Share"`
+	MarketCap        float64 `json:"Market Cap"`
+	Price            float32 `json:"Price"`
+	PricePerBook     float32 `json:"Price/Book"`
+	PricePerEarnings float32 `json:"Price/Earnings"`
+	PricePerSales    float32 `json:"Price/Sales"`
+	Symbol           string  `json:"Symbol"`
+}
+
+func buildFinancialLookup() map[string]financeData {
+	raw, err := ioutil.ReadFile("./financial.json")
+	fatal(err)
+
+	var list []financeData
+
+	err = json.Unmarshal(raw, &list)
+	fatal(err)
+
+	lookup := map[string]financeData{}
+	for _, item := range list {
+		lookup[item.Symbol] = item
+	}
+
+	return lookup
 }
