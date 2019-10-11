@@ -12,6 +12,6 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway v1.8.5 // indirect
 	github.com/mattn/go-colorable v0.1.1 // indirect
 	github.com/mattn/go-isatty v0.0.7 // indirect
-	github.com/semi-technologies/weaviate v0.0.0-20190624132527-b02c631b2877187532600bb2aa5c90938cf68d55
+	github.com/semi-technologies/weaviate v0.0.0-20190624132527-38fa949bd7afa0862fb8755bdc9382fd56f2945f
 	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4 // indirect
 )

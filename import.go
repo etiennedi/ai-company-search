@@ -45,7 +45,7 @@ func main() {
 	importCompanies(client, companies)
 }
 
-func importSchema(client *client.WeaviateDecentralisedKnowledgeGraph) {
+func importSchema(client *client.Weaviate) {
 	tc := &models.Class{
 		Class: "Company",
 		Properties: []*models.Property{
@@ -121,8 +121,7 @@ func importSchema(client *client.WeaviateDecentralisedKnowledgeGraph) {
 	fatal(err)
 }
 
-func importCompanies(client *client.WeaviateDecentralisedKnowledgeGraph,
-	companies []company) {
+func importCompanies(client *client.Weaviate, companies []company) {
 	for i, c := range companies {
 
 		thing := models.Thing{
@@ -197,7 +196,7 @@ func fatal(err error) {
 	}
 }
 
-func weaviateClient() *client.WeaviateDecentralisedKnowledgeGraph {
+func weaviateClient() *client.Weaviate {
 	transport := goswagger.New("localhost:8080", "/v1", []string{"http"})
 	client := client.New(transport, strfmt.Default)
 	return client
