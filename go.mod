@@ -1,17 +1,11 @@
 module github.com/etiennedi/company-search
 
 require (
-	github.com/coreos/bbolt v1.3.2 // indirect
-	github.com/coreos/go-semver v0.3.0 // indirect
-	github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e // indirect
-	github.com/davecgh/go-spew v1.1.1
-	github.com/go-openapi/runtime v0.19.2
-	github.com/go-openapi/strfmt v0.19.2
-	github.com/golang/snappy v0.0.1 // indirect
-	github.com/google/btree v1.0.0 // indirect
-	github.com/grpc-ecosystem/grpc-gateway v1.8.5 // indirect
-	github.com/mattn/go-colorable v0.1.1 // indirect
-	github.com/mattn/go-isatty v0.0.7 // indirect
-	github.com/semi-technologies/weaviate v0.0.0-20190624132527-38fa949bd7afa0862fb8755bdc9382fd56f2945f
-	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4 // indirect
+	github.com/go-openapi/runtime v0.19.9
+	github.com/go-openapi/strfmt v0.19.4
+	github.com/semi-technologies/weaviate v0.0.0-20191218111007-d9162fcf7909
 )
+
+replace github.com/coreos/go-systemd => github.com/coreos/go-systemd/v22 v22.0.0
+
+go 1.13
